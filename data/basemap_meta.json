@@ -1,0 +1,56 @@
+{
+ "nusa_dua": {
+  "label": "Nusa Dua",
+  "image": "data/nusa_dua.jpg",
+  "bounds": [
+   [
+    -8.817524,
+    115.208258
+   ],
+   [
+    -8.782036,
+    115.243307
+   ]
+  ],
+  "size": [
+   1344,
+   1377
+  ]
+ },
+ "mandalika": {
+  "label": "Mandalika",
+  "image": "data/mandalika.jpg",
+  "bounds": [
+   [
+    -8.923324,
+    116.277287
+   ],
+   [
+    -8.883929,
+    116.349592
+   ]
+  ],
+  "size": [
+   1472,
+   812
+  ]
+ },
+ "golo_mori": {
+  "label": "Golo Mori",
+  "image": "data/golo_mori.jpg",
+  "bounds": [
+   [
+    -8.707032,
+    119.792258
+   ],
+   [
+    -8.669506,
+    119.824426
+   ]
+  ],
+  "size": [
+   1118,
+   1320
+  ]
+ }
+}

@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Inventarisasi Kejadian Bencana Kawasan ITDC</title>
+    <meta
+      name="description"
+      content="Peta interaktif untuk inventarisasi kejadian bencana di Kawasan Nusa Dua, Mandalika, dan Golo Mori."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"
+    />
+    <link rel="stylesheet" href="vendor/leaflet.css" />
+    <link rel="stylesheet" href="assets/style.css" />
+  </head>
+  <body>
+    <!-- =============================================== pemilih kawasan ===== -->
+    <div id="pemilih">
+      <div class="pemilih-inner">
+        <div class="pemilih-kop"><span>Inventarisasi Risiko Bencana</span></div>
+        <h1>Peta Kejadian Bencana<br />Kawasan ITDC</h1>
+        <p class="lead">
+          Catat kejadian yang merugikan kawasan: banjir, abrasi, gelombang
+          tinggi, longsor, angin kencang, kebakaran, dan lainnya. Tiap kejadian
+          digambar sebagai titik, garis, atau area, lalu dilengkapi keterangan
+          dampaknya. Mulai dengan memilih kawasan.
+        </p>
+
+        <div class="kartu-kawasan-grid" id="kartuKawasan"></div>
+
+        <div class="pemilih-kaki">
+          <span id="statusSumber">Memuat data kawasan…</span>
+          <button type="button" id="bukaPengaturanAwal">
+            Pengaturan spreadsheet
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================= aplikasi === -->
+    <div id="app">
+      <header class="topbar">
+        <div class="merek">
+          <div class="merek-tanda">ITDC</div>
+          <div class="merek-teks">
+            <strong>Inventarisasi Bencana</strong>
+            <span>Kawasan Pariwisata ITDC</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="bar-kawasan"
+          id="tombolKawasan"
+          title="Ganti kawasan"
+        >
+          <b id="namaKawasan">Kawasan</b>
+          <span class="tukar">ganti</span>
+        </button>
+
+        <div class="bar-sisa">
+          <button
+            type="button"
+            class="status-sinkron"
+            id="statusSinkron"
+            data-st="luring"
+            title="Status sambungan ke spreadsheet"
+          >
+            <span class="status-titik"></span
+            ><span id="statusTeks">Mode lokal</span>
+          </button>
+
+          <button
+            type="button"
+            class="ikon-btn hanya-mobil"
+            id="tombolPanel"
+            title="Daftar kejadian"
+            aria-label="Daftar kejadian"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="ikon-btn"
+            id="tombolTema"
+            title="Ganti tema terang/gelap"
+            aria-label="Ganti tema"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="ikon-btn"
+            id="tombolPengaturan"
+            title="Pengaturan"
+            aria-label="Pengaturan"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+              />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ----------------------------------------------------------- panel -->
+      <aside id="panel">
+        <div class="panel-blok">
+          <div class="panel-judul">Tambah kejadian</div>
+          <div class="alat-grid">
+            <button type="button" class="alat" data-alat="titik">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+                <circle cx="12" cy="10" r="2.4" />
+              </svg>
+              Titik
+            </button>
+            <button type="button" class="alat" data-alat="garis">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m5 17 5-7 4 3 5-8" />
+                <circle cx="5" cy="17" r="2" />
+                <circle cx="19" cy="5" r="2" />
+              </svg>
+              Garis
+            </button>
+            <button type="button" class="alat" data-alat="area">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 7.5 10 4l10 4.5-3 9.5-9 2.5Z" />
+              </svg>
+              Area
+            </button>
+          </div>
+          <div class="alat-petunjuk" id="alatPetunjuk"></div>
+        </div>
+
+        <div class="panel-blok">
+          <div class="saring-baris">
+            <div class="cari-kotak">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.2-3.2" />
+              </svg>
+              <input
+                type="text"
+                id="cari"
+                placeholder="Cari lokasi, aset, catatan…"
+                autocomplete="off"
+              />
+            </div>
+            <select id="saringJenis" title="Saring menurut jenis kejadian">
+              <option value="">Semua jenis</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="daftar-bungkus">
+          <div class="daftar-kepala">
+            <div class="panel-judul">Daftar kejadian</div>
+            <div class="hitung" id="hitungDaftar">0</div>
+          </div>
+          <div id="daftar"></div>
+        </div>
+
+        <div class="panel-kaki">
+          <button type="button" class="btn kecil" id="tombolUnduh">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16" />
+            </svg>
+            Unduh data
+          </button>
+          <button type="button" class="btn kecil" id="tombolSinkron">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2" />
+              <path d="M3 20v-5h5M21 4v5h-5" />
+            </svg>
+            Sinkron
+          </button>
+        </div>
+      </aside>
+
+      <!-- ------------------------------------------------------------ peta -->
+      <main id="peta">
+        <div class="peta-alat-kanan">
+          <div class="kotak-lapis">
+            <div class="panel-judul">Lapisan peta</div>
+            <div id="pilihDasar"></div>
+            <div class="panel-judul">Lapisan kawasan</div>
+            <label class="lapis-baris"
+              ><input type="checkbox" id="lapisBatas" checked /> Batas
+              kawasan</label
+            >
+            <label class="lapis-baris"
+              ><input type="checkbox" id="lapisCitra" /> Peta masterplan</label
+            >
+            <div class="opasitas">
+              <input
+                type="range"
+                id="opasitasCitra"
+                min="10"
+                max="100"
+                value="80"
+              /><span id="opasitasNilai">80%</span>
+            </div>
+            <label class="lapis-baris" id="barisZona" hidden
+              ><input type="checkbox" id="lapisZona" /> Zona Mandalika</label
+            >
+          </div>
+
+          <button
+            type="button"
+            class="peta-btn"
+            id="tombolLokasiSaya"
+            title="Ke lokasi saya"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="3.2" />
+              <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+              <circle cx="12" cy="12" r="8" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="peta-btn"
+            id="tombolPasKawasan"
+            title="Pas ke batas kawasan"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="gambar-bar" id="gambarBar">
+          <span class="teks" id="gambarTeks"></span>
+          <button type="button" class="btn kecil" id="gambarBatal">
+            Batal
+          </button>
+          <button type="button" class="btn kecil" id="gambarUndo">
+            Hapus titik
+          </button>
+          <button type="button" class="btn kecil utama" id="gambarSelesai">
+            Selesai
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <!-- =========================================================== drawer === -->
+    <section id="drawer" aria-label="Formulir kejadian">
+      <div class="drawer-kepala">
+        <div>
+          <h2 id="drawerJudul">Kejadian baru</h2>
+          <div class="sub" id="drawerSub"></div>
+        </div>
+        <button
+          type="button"
+          class="ikon-btn tutup"
+          id="drawerTutup"
+          aria-label="Tutup formulir"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="drawer-isi">
+        <div class="ukur-kotak" id="ukurKotak"></div>
+
+        <form id="formKejadian" autocomplete="off">
+          <fieldset>
+            <legend>Identitas kejadian</legend>
+            <div class="rubrik">
+              <div class="isian">
+                <label for="f_jenis">Jenis kejadian <span class="wajib">*</span></label>
+                <select id="f_jenis" name="jenis" required></select>
+                <span class="bantu sembunyi" id="ketKelas"></span>
+              </div>
+
+              <div class="isian sembunyi" id="bungkusJenisLain">
+                <label for="f_jenis_lain">Sebutkan jenis kejadian</label>
+                <input
+                  type="text"
+                  id="f_jenis_lain"
+                  name="jenis_lain"
+                  placeholder="misal: angin kencang disertai hujan es"
+                />
+              </div>
+
+              <div class="rubrik dua">
+                <div class="isian">
+                  <label for="f_tahun">Tahun kejadian</label>
+                  <select id="f_tahun" name="tahun"></select>
+                </div>
+                <div class="isian">
+                  <label for="f_bulan">Bulan</label>
+                  <select id="f_bulan" name="bulan"></select>
+                </div>
+              </div>
+
+              <div class="rubrik dua">
+                <div class="isian">
+                  <label for="f_musim">Musim</label>
+                  <select id="f_musim" name="musim"></select>
+                  <span class="bantu">Isi kalau bulannya tidak diingat.</span>
+                </div>
+                <div class="isian">
+                  <label for="f_keparahan">Tingkat keparahan</label>
+                  <select id="f_keparahan" name="keparahan">
+                    <option value="">Belum dinilai</option>
+                    <option>Ringan</option>
+                    <option>Sedang</option>
+                    <option>Berat</option>
+                    <option>Sangat berat</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="rubrik dua">
+                <div class="isian">
+                  <label for="f_tanggal_mulai">Tanggal persis</label>
+                  <input type="date" id="f_tanggal_mulai" name="tanggal_mulai" />
+                  <span class="bantu">Isi hanya kalau tanggalnya masih diingat.</span>
+                </div>
+                <div class="isian">
+                  <label for="f_tanggal_selesai">Tanggal berakhir</label>
+                  <input type="date" id="f_tanggal_selesai" name="tanggal_selesai" />
+                </div>
+              </div>
+
+              <div class="isian">
+                <label for="f_lama_jam">Lama kejadian (jam)</label>
+                <input
+                  type="number"
+                  id="f_lama_jam"
+                  name="lama_jam"
+                  min="0"
+                  step="0.5"
+                  placeholder="misal: 6"
+                />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Lokasi dan aset terdampak</legend>
+            <div class="rubrik">
+              <div class="isian">
+                <label for="f_lokasi">Nama lokasi / blok</label>
+                <input
+                  type="text"
+                  id="f_lokasi"
+                  name="lokasi"
+                  placeholder="misal: Jalan utama depan Lot N-5"
+                />
+              </div>
+              <div class="isian">
+                <label for="f_aset">Aset ITDC yang terdampak</label>
+                <textarea
+                  id="f_aset"
+                  name="aset_terdampak"
+                  placeholder="misal: saluran drainase primer, trotoar, lampu taman, lahan siap bangun Lot C-3"
+                ></textarea>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Kerugian bagi ITDC</legend>
+            <div class="rubrik">
+              <div class="isian">
+                <label
+                  >Bentuk dampak
+                  <span class="bantu sebaris"
+                    >boleh lebih dari satu</span
+                  ></label
+                >
+                <div class="centang-grid" id="dampakGrid"></div>
+              </div>
+              <div class="rubrik dua">
+                <div class="isian">
+                  <label for="f_kerugian">Estimasi kerugian (Rp)</label>
+                  <input
+                    type="number"
+                    id="f_kerugian"
+                    name="kerugian_rp"
+                    min="0"
+                    step="100000"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="isian">
+                  <label for="f_biaya">Biaya penanganan (Rp)</label>
+                  <input
+                    type="number"
+                    id="f_biaya"
+                    name="biaya_penanganan_rp"
+                    min="0"
+                    step="100000"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              <div class="isian">
+                <label for="f_penanganan">Penanganan yang dilakukan</label>
+                <textarea
+                  id="f_penanganan"
+                  name="penanganan"
+                  placeholder="misal: pengerukan sedimen saluran, pemasangan karung pasir sementara"
+                ></textarea>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset id="blokParameter">
+            <legend>Parameter fisik</legend>
+            <p class="catatan-kosong" id="parameterKosong">
+              Pilih jenis kejadian dulu. Isian yang muncul menyesuaikan jenisnya.
+            </p>
+            <div class="rubrik dua">
+              <div class="isian par" data-par="kedalaman_cm">
+                <label for="f_kedalaman">Kedalaman genangan (cm)</label>
+                <input
+                  type="number"
+                  id="f_kedalaman"
+                  name="kedalaman_cm"
+                  min="0"
+                  step="1"
+                />
+              </div>
+              <div class="isian par" data-par="tinggi_gelombang_m">
+                <label for="f_gelombang">Tinggi gelombang (m)</label>
+                <input
+                  type="number"
+                  id="f_gelombang"
+                  name="tinggi_gelombang_m"
+                  min="0"
+                  step="0.1"
+                />
+              </div>
+              <div class="isian par" data-par="panjang_terdampak_m">
+                <label for="f_panjang">Panjang terdampak (m)</label>
+                <input
+                  type="number"
+                  id="f_panjang"
+                  name="panjang_terdampak_m"
+                  min="0"
+                  step="1"
+                />
+                <span class="bantu">Terisi otomatis dari panjang garis yang digambar. Boleh diubah.</span>
+            </div>
+              <div class="isian par" data-par="luas_terdampak_m2">
+                <label for="f_luas">Luas terdampak (m²)</label>
+                <input
+                  type="number"
+                  id="f_luas"
+                  name="luas_terdampak_m2"
+                  min="0"
+                  step="1"
+                />
+                <span class="bantu">Terisi otomatis dari luas area yang digambar. Boleh diubah.</span>
+            </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Sumber dan dokumentasi</legend>
+            <div class="rubrik">
+              <div class="rubrik dua">
+                <div class="isian">
+                  <label for="f_sumber">Sumber informasi</label>
+                  <select id="f_sumber" name="sumber">
+                    <option value="">Belum dipilih</option>
+                    <option>Observasi lapangan</option>
+                    <option>Laporan internal ITDC</option>
+                    <option>Wawancara / FGD</option>
+                    <option>Pemberitaan media</option>
+                    <option>Data BPBD / BMKG</option>
+                    <option>Dokumen kajian</option>
+                    <option>Lainnya</option>
+                  </select>
+                </div>
+                <div class="isian">
+                  <label for="f_pencatat">Pencatat</label>
+                  <input
+                    type="text"
+                    id="f_pencatat"
+                    name="pencatat"
+                    placeholder="nama pencatat"
+                  />
+                </div>
+              </div>
+              <div class="isian">
+                <label for="f_sumber_detail">Keterangan sumber</label>
+                <input
+                  type="text"
+                  id="f_sumber_detail"
+                  name="sumber_detail"
+                  placeholder="misal: notulen FGD 12 Nov 2026, narasumber Divisi Operasi"
+                />
+              </div>
+              <div class="isian">
+                <label for="f_catatan">Catatan</label>
+                <textarea
+                  id="f_catatan"
+                  name="catatan"
+                  placeholder="keterangan tambahan, kronologi singkat, dugaan penyebab"
+                ></textarea>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+      <div class="drawer-kaki">
+        <button
+          type="button"
+          class="btn bahaya"
+          id="tombolHapus"
+          title="Hapus kejadian ini"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13" />
+          </svg>
+        </button>
+        <button type="button" class="btn" id="tombolUbahGeometri">
+          Ubah geometri
+        </button>
+        <button type="button" class="btn utama" id="tombolSimpan">
+          Simpan kejadian
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================= modal unduh == -->
+    <div class="tirai" id="tiraiUnduh">
+      <div class="modal">
+        <div class="modal-kepala">
+          <h2>Unduh data kejadian</h2>
+          <button
+            type="button"
+            class="ikon-btn tutup"
+            data-tutup="tiraiUnduh"
+            aria-label="Tutup"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-isi">
+          <div class="info-kotak">
+            Data utama tersimpan di Google Spreadsheet. Unduhan di bawah ini
+            untuk keperluan GIS dan arsip lokal.
+          </div>
+          <div class="isian">
+            <label for="unduhLingkup">Cakupan</label>
+            <select id="unduhLingkup">
+              <option value="kawasan">Kawasan aktif saja</option>
+              <option value="semua">Semua kawasan (yang sudah dimuat)</option>
+            </select>
+          </div>
+          <div class="tumpuk">
+            <button type="button" class="btn penuh" data-unduh="geojson">
+              Unduh GeoJSON (.geojson)
+            </button>
+            <button type="button" class="btn penuh" data-unduh="csv">
+              Unduh tabel (.csv)
+            </button>
+            <button type="button" class="btn penuh" data-unduh="xlsx">
+              Unduh Excel (.xlsx)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================== modal pengaturan == -->
+    <div class="tirai" id="tiraiPengaturan">
+      <div class="modal">
+        <div class="modal-kepala">
+          <h2>Pengaturan</h2>
+          <button
+            type="button"
+            class="ikon-btn tutup"
+            data-tutup="tiraiPengaturan"
+            aria-label="Tutup"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-isi">
+          <div class="isian">
+            <label for="setUrl">URL Web App Apps Script</label>
+            <input
+              type="url"
+              id="setUrl"
+              placeholder="https://script.google.com/macros/s/…/exec"
+            />
+            <span class="bantu"
+              >Deploy Apps Script sebagai Web App (Execute as: Me, Who has
+              access: Anyone), lalu tempel URL yang berakhiran
+              <code>/exec</code>.</span
+            >
+          </div>
+          <div class="isian">
+            <label for="setPencatat">Nama pencatat</label>
+            <input
+              type="text"
+              id="setPencatat"
+              placeholder="nama yang otomatis terisi pada formulir"
+            />
+          </div>
+          <div class="info-kotak" id="infoSambungan">
+            Belum tersambung. Tanpa URL, data hanya tersimpan di browser ini.
+          </div>
+        </div>
+        <div class="modal-kaki">
+          <button type="button" class="btn" id="ujiSambungan">
+            Uji sambungan
+          </button>
+          <button type="button" class="btn utama" id="simpanPengaturan">
+            Simpan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================================================== modal konfirmasi = -->
+    <div class="tirai" id="tiraiKonfirmasi">
+      <div class="modal sempit">
+        <div class="modal-kepala"><h2 id="konfirmasiJudul">Konfirmasi</h2></div>
+        <div class="modal-isi">
+          <p id="konfirmasiPesan" class="konfirmasi-teks"></p>
+        </div>
+        <div class="modal-kaki">
+          <button type="button" class="btn" id="konfirmasiBatal">Batal</button>
+          <button type="button" class="btn bahaya" id="konfirmasiYa">
+            Ya, lanjutkan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-wadah"></div>
+
+    <script src="vendor/leaflet.js"></script>
+    <script src="assets/config.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>
