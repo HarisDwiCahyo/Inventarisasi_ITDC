@@ -90,6 +90,8 @@
     lapisBatas: null,
     lapisCitra: null,
     lapisZona: null,
+    lapisBahaya: null,    // overlay bahaya terpilih
+    bahaya: null,         // data/bahaya.json
     dasar: {},
     dasarAktif: 'satelit',
     gambar: null,         // { mode, titik: [LatLng], pratinjau, simpul: [] }
@@ -466,6 +468,13 @@
     L.control.zoom({ position: 'bottomright' }).addTo(S.peta);
     L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(S.peta);
 
+    // Masterplan di bawah, lapisan bahaya di atasnya, geometri kejadian tetap paling atas.
+    [['citra', 380], ['bahaya', 390]].forEach(function (p) {
+      S.peta.createPane(p[0]);
+      S.peta.getPane(p[0]).style.zIndex = p[1];
+      S.peta.getPane(p[0]).style.pointerEvents = 'none';
+    });
+
     S.dasar = {
       satelit: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 21, maxNativeZoom: 19,
@@ -528,6 +537,7 @@
 
     if (k.basemap && k.basemap.image) {
       S.lapisCitra = L.imageOverlay(k.basemap.image, k.basemap.bounds, {
+        pane: 'citra',
         opacity: Number($('#opasitasCitra').value) / 100,
         interactive: false
       });
@@ -548,6 +558,7 @@
       $('#lapisZona').checked = false;
     }
 
+    isiPilihanBahaya();
     pasKawasan();
   }
 
@@ -555,6 +566,125 @@
     if (!S.kawasan) return;
     var b = S.kawasan.bbox;
     S.peta.fitBounds([[b[1], b[0]], [b[3], b[2]]], { padding: [28, 28] });
+  }
+
+  /* ------------------------------------------------------- lapisan bahaya */
+  /* Lapisan bahaya memakai PNG yang sudah diwarnai (lihat tools/build_bahaya.py)
+     plus indeks data/bahaya.json, jadi situs tetap statis tanpa pustaka raster. */
+
+  var LABEL_BAHAYA = {
+    banjir: 'Banjir: kedalaman genangan',
+    erosi: 'Erosi: mundurnya garis pantai'
+  };
+
+  function metaBahaya() {
+    if (!S.bahaya || !S.kawasan) return {};
+    return S.bahaya.kawasan[S.kawasan.id] || {};
+  }
+
+  function isiSelectBahaya(sel, opsi) {
+    var lama = sel.value;
+    sel.innerHTML = '';
+    opsi.forEach(function (o) {
+      var e = document.createElement('option');
+      e.value = o.v;
+      e.textContent = o.t;
+      sel.appendChild(e);
+    });
+    var adaLama = opsi.some(function (o) { return String(o.v) === lama; });
+    if (adaLama) sel.value = lama;
+  }
+
+  function isiPilihanBahaya() {
+    var meta = metaBahaya();
+    var jenis = Object.keys(meta);
+    var belumMuat = !S.bahaya;
+
+    $('#bahayaKosong').textContent = belumMuat
+      ? 'Memuat data bahaya…'
+      : 'Data bahaya belum tersedia untuk kawasan ini.';
+    $('#bahayaKosong').hidden = jenis.length > 0;
+    $('#bahayaKontrol').hidden = jenis.length === 0;
+    if (!jenis.length) { hapusLapisBahaya(); return; }
+
+    var sel = $('#bahayaJenis');
+    sel.innerHTML = '<option value="">Tidak ditampilkan</option>';
+    jenis.forEach(function (j) {
+      var o = document.createElement('option');
+      o.value = j;
+      o.textContent = LABEL_BAHAYA[j] || j;
+      sel.appendChild(o);
+    });
+    sel.value = '';
+    isiDimensiBahaya();
+  }
+
+  function isiDimensiBahaya() {
+    var meta = metaBahaya()[$('#bahayaJenis').value];
+    $('#bahayaDimensi').hidden = !meta;
+    if (!meta) { perbaruiBahaya(); return; }
+
+    isiSelectBahaya($('#bahayaSkenario'), meta.skenario.map(function (s2) {
+      return { v: s2.id, t: s2.label };
+    }));
+    var daftar = meta.periode || meta.tahun || [];
+    $('#labelBahayaPeriode').textContent = meta.periode ? 'Periode' : 'Tahun';
+    isiSelectBahaya($('#bahayaPeriode'), daftar.map(function (p) {
+      return { v: p, t: p };
+    }));
+    $('#barisBahayaT').hidden = !meta.return_period;
+    if (meta.return_period) {
+      isiSelectBahaya($('#bahayaT'), meta.return_period.map(function (t) {
+        return { v: t, t: 'T' + t + ' (' + t + ' tahun)' };
+      }));
+    }
+    perbaruiBahaya();
+  }
+
+  function hapusLapisBahaya() {
+    if (S.lapisBahaya) {
+      S.peta.removeLayer(S.lapisBahaya);
+      S.lapisBahaya = null;
+    }
+    $('#legendaBahaya').hidden = true;
+  }
+
+  function perbaruiBahaya() {
+    hapusLapisBahaya();
+    var jenis = $('#bahayaJenis').value;
+    var meta = metaBahaya()[jenis];
+    if (!meta) return;
+
+    var berkas = meta.berkas
+      .replace('{skenario}', $('#bahayaSkenario').value)
+      .replace('{periode}', $('#bahayaPeriode').value)
+      .replace('{tahun}', $('#bahayaPeriode').value)
+      .replace('{T}', $('#bahayaT').value);
+
+    S.lapisBahaya = L.imageOverlay(berkas, meta.bounds, {
+      pane: 'bahaya',
+      opacity: Number($('#opasitasBahaya').value) / 100,
+      interactive: false
+    });
+    S.lapisBahaya.on('error', function () {
+      toast('Berkas lapisan bahaya tidak ditemukan: ' + berkas, 'galat');
+    });
+    S.lapisBahaya.addTo(S.peta);
+    gambarLegendaBahaya(jenis, meta);
+  }
+
+  function gambarLegendaBahaya(jenis, meta) {
+    var leg = S.bahaya && S.bahaya.legenda ? S.bahaya.legenda[jenis] : null;
+    if (!leg) return;
+    var kotak = $('#legendaBahaya');
+    kotak.innerHTML =
+      '<div class="legenda-judul">' + leg.judul + '</div>' +
+      leg.kelas.map(function (k) {
+        return '<div class="legenda-baris"><span class="legenda-kotak" style="background:' +
+          k.warna + '"></span>' + k.label + '</div>';
+      }).join('') +
+      '<p class="legenda-sumber">' + meta.catatan + '</p>';
+    kotak.hidden = false;
   }
 
   /* ------------------------------------------------------- gambar fitur -- */
@@ -780,7 +910,7 @@
     S.sunting = { uid: uid, mode: g.mode, titik: g.ll.slice(), simpul: [], lapis: null, asli: rek.geometry_geojson };
     gambarSuntingan();
     $('#gambarBar').classList.add('tampil');
-    $('#gambarTeks').innerHTML = '<b>Mengubah geometri</b> · seret simpul, klik simpul tengah untuk menambah';
+    $('#gambarTeks').innerHTML = '<b>Mengubah geometri</b> · seret simpul, klik simpul pudar untuk menambah';
     $('#gambarUndo').disabled = true;
     $('#gambarSelesai').disabled = false;
     toast('Seret simpul untuk memindahkan. Tekan Selesai bila sudah pas.', 'info', 4200);
@@ -1485,6 +1615,15 @@
       if (!S.lapisZona) return;
       this.checked ? S.lapisZona.addTo(S.peta) : S.peta.removeLayer(S.lapisZona);
     });
+    $('#bahayaJenis').addEventListener('change', isiDimensiBahaya);
+    ['#bahayaSkenario', '#bahayaPeriode', '#bahayaT'].forEach(function (id) {
+      $(id).addEventListener('change', perbaruiBahaya);
+    });
+    $('#opasitasBahaya').addEventListener('input', function () {
+      $('#opasitasBahayaNilai').textContent = this.value + '%';
+      if (S.lapisBahaya) S.lapisBahaya.setOpacity(Number(this.value) / 100);
+    });
+
     $('#opasitasCitra').addEventListener('input', function () {
       $('#opasitasNilai').textContent = this.value + '%';
       if (S.lapisCitra) S.lapisCitra.setOpacity(Number(this.value) / 100);
@@ -1560,6 +1699,15 @@
     muatSetelan();
     isiPilihanJenis();
     pasangPeristiwa();
+
+    fetch('data/bahaya.json')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        S.bahaya = d;
+        if (S.kawasan) isiPilihanBahaya();
+      })
+      .catch(function () { /* lapisan bahaya opsional, situs tetap jalan */ });
 
     fetch('data/kawasan.json')
       .then(function (r) {

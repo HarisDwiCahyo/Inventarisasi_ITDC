@@ -15,6 +15,9 @@ assets/app.js           seluruh logika peta, formulir, dan sinkronisasi
 assets/config.js        URL Apps Script dan nama pencatat bawaan  <- yang perlu diisi
 data/kawasan.json       batas kawasan, bbox, zona Mandalika, acuan citra
 data/*.jpg              peta masterplan tiap kawasan (sudah diluruskan ke Web Mercator)
+data/bahaya.json        indeks lapisan bahaya: bounds, pilihan, dan legenda
+data/bahaya/            PNG kedalaman banjir dan mundurnya garis pantai
+tools/build_bahaya.py   penyiap lapisan bahaya dari raster model
 vendor/                 Leaflet 1.9.4 dan SheetJS 0.18.5 (lokal, tanpa CDN)
 apps-script/Code.gs     contoh backend spreadsheet, siap tempel
 ```
@@ -140,6 +143,45 @@ Peta dasar memakai layanan daring: citra satelit Esri, peta jalan
 OpenStreetMap, dan topografi Esri. Lapisan tambahan: batas kawasan
 (dari shapefile proyek), peta masterplan ITDC dengan penggeser transparansi,
 serta zona Mandalika beserta kodenya.
+
+### Lapisan bahaya
+
+Di bawah panel lapisan ada pemilih **Lapisan bahaya** dengan dua pilihan.
+
+| Lapisan | Yang dipetakan | Legenda |
+|---|---|---|
+| Banjir | kedalaman genangan tiap sel | 6 kelas biru, 0,05 m sampai lebih dari 1,00 m |
+| Erosi | mundurnya garis pantai pada sel yang terklasifikasi erosi | 6 kelas merah, 0 m sampai lebih dari 25 m |
+
+Pilihan dimensinya menyesuaikan lapisan. Banjir memakai skenario SSP, periode,
+dan return period (T5, T10, T25, T50); erosi memakai skenario SSP dan tahun.
+Transparansinya bisa digeser seperti peta masterplan. Urutan tumpukan sudah
+diatur lewat pane Leaflet: ubin peta dasar, lalu masterplan, lalu lapisan
+bahaya, dan geometri kejadian selalu paling atas supaya tidak tertutup.
+
+Nusa Dua dan Mandalika punya kedua lapisan. Golo Mori belum punya data model,
+jadi panelnya menampilkan keterangan bahwa datanya belum tersedia.
+
+Lapisan ini berupa PNG yang sudah diwarnai, bukan GeoTIFF, supaya situs tetap
+statis dan tidak perlu pustaka raster di browser. Semua berkas dibuat ulang
+dengan:
+
+```bash
+python3 tools/build_bahaya.py     # butuh rasterio, numpy, Pillow
+```
+
+Sumber rasternya:
+
+- Banjir Nusa Dua: `Praktikum/App Flood/Nusa Dua/web/data/ssp*.tif` (v5, sudah WGS84).
+- Banjir Mandalika: `Praktikum/App Flood/Mandalika/Output_Kedalaman_v5_ENSEMBLE/`,
+  varian **median** lima GCM, direproyeksi dari UTM 50S.
+- Erosi: `stack_proyeksi_<tahun>.tif` pada pipeline SLR Bruun kedua kawasan,
+  band `D_retreat_total_m` disaring pada sel `kelas = 1 (erosi)` saja, supaya
+  daratan yang sebenarnya tidak tergerus tidak ikut diwarnai.
+
+Angka pada legenda bahaya berasal dari model proyeksi, bukan dari catatan
+kejadian di lapangan. Keduanya sengaja dipisah: lapisan bahaya hanya latar
+pembanding saat menandai lokasi kejadian.
 
 Sumber batas: `Praktikum/Data/Nusa_Dua_final.shp`, `Mandalika_final.shp`,
 `Golomori.shp`. Citra masterplan berasal dari `nusadua.jpg`, `mandalika.jpg`,

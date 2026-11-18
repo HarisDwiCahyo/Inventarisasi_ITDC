@@ -278,6 +278,36 @@
             <label class="lapis-baris" id="barisZona" hidden
               ><input type="checkbox" id="lapisZona" /> Zona Mandalika</label
             >
+
+            <div class="panel-judul">Lapisan bahaya</div>
+            <p class="lapis-catatan" id="bahayaKosong" hidden>
+              Data bahaya belum tersedia untuk kawasan ini.
+            </p>
+            <div id="bahayaKontrol">
+              <select id="bahayaJenis" class="lapis-select"></select>
+              <div id="bahayaDimensi" hidden>
+                <label class="lapis-pilih"
+                  ><span>Skenario</span><select id="bahayaSkenario"></select
+                ></label>
+                <label class="lapis-pilih"
+                  ><span id="labelBahayaPeriode">Periode</span
+                  ><select id="bahayaPeriode"></select
+                ></label>
+                <label class="lapis-pilih" id="barisBahayaT"
+                  ><span>Return period</span><select id="bahayaT"></select
+                ></label>
+                <div class="opasitas">
+                  <input
+                    type="range"
+                    id="opasitasBahaya"
+                    min="10"
+                    max="100"
+                    value="85"
+                  /><span id="opasitasBahayaNilai">85%</span>
+                </div>
+              </div>
+            </div>
+            <div id="legendaBahaya" class="legenda-bahaya" hidden></div>
           </div>
 
           <button

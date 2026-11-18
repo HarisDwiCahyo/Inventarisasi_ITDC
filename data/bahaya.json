@@ -1,0 +1,239 @@
+{
+ "legenda": {
+  "banjir": {
+   "judul": "Kedalaman banjir (meter)",
+   "kelas": [
+    {
+     "warna": "#deebf7",
+     "label": "0,05 - 0,10"
+    },
+    {
+     "warna": "#9ecae1",
+     "label": "0,10 - 0,25"
+    },
+    {
+     "warna": "#6baed6",
+     "label": "0,25 - 0,50"
+    },
+    {
+     "warna": "#3182bd",
+     "label": "0,50 - 0,75"
+    },
+    {
+     "warna": "#08519c",
+     "label": "0,75 - 1,00"
+    },
+    {
+     "warna": "#08306b",
+     "label": "lebih dari 1,00"
+    }
+   ]
+  },
+  "erosi": {
+   "judul": "Mundurnya garis pantai (meter)",
+   "kelas": [
+    {
+     "warna": "#fee5d9",
+     "label": "0 - 5"
+    },
+    {
+     "warna": "#fcae91",
+     "label": "5 - 10"
+    },
+    {
+     "warna": "#fb6a4a",
+     "label": "10 - 15"
+    },
+    {
+     "warna": "#de2d26",
+     "label": "15 - 20"
+    },
+    {
+     "warna": "#a50f15",
+     "label": "20 - 25"
+    },
+    {
+     "warna": "#67000d",
+     "label": "lebih dari 25"
+    }
+   ]
+  }
+ },
+ "kawasan": {
+  "nusa_dua": {
+   "banjir": {
+    "bounds": [
+     [
+      -8.8463936,
+      115.1758733
+     ],
+     [
+      -8.7531499,
+      115.24109
+     ]
+    ],
+    "skenario": [
+     {
+      "id": "ssp245",
+      "label": "SSP 2-4.5 (emisi rendah)"
+     },
+     {
+      "id": "ssp370",
+      "label": "SSP 3-7.0 (emisi sedang)"
+     },
+     {
+      "id": "ssp585",
+      "label": "SSP 5-8.5 (emisi tinggi)"
+     }
+    ],
+    "periode": [
+     "2040-an",
+     "2050-an",
+     "2060-an",
+     "2070-an",
+     "2080-an"
+    ],
+    "return_period": [
+     5,
+     10,
+     25,
+     50
+    ],
+    "berkas": "data/bahaya/banjir/nusa_dua/{skenario}_{periode}_T{T}.png",
+    "catatan": "Kedalaman genangan hasil pemodelan hidrologi-hidraulika Nusa Dua v5."
+   },
+   "erosi": {
+    "bounds": [
+     [
+      -8.8140948,
+      115.2259651
+     ],
+     [
+      -8.7834107,
+      115.24065
+     ]
+    ],
+    "skenario": [
+     {
+      "id": "ssp126",
+      "label": "SSP 1-2.6 (emisi sangat rendah)"
+     },
+     {
+      "id": "ssp245",
+      "label": "SSP 2-4.5 (emisi rendah)"
+     },
+     {
+      "id": "ssp370",
+      "label": "SSP 3-7.0 (emisi sedang)"
+     },
+     {
+      "id": "ssp585",
+      "label": "SSP 5-8.5 (emisi tinggi)"
+     }
+    ],
+    "tahun": [
+     2030,
+     2035,
+     2040,
+     2045,
+     2050,
+     2055,
+     2060
+    ],
+    "berkas": "data/bahaya/erosi/nusa_dua/{skenario}_{tahun}.png",
+    "catatan": "Mundurnya garis pantai pada sel yang terklasifikasi erosi, proyeksi laju alami ditambah kenaikan muka laut (aturan Bruun)."
+   }
+  },
+  "mandalika": {
+   "banjir": {
+    "bounds": [
+     [
+      -8.9312769,
+      116.1792675
+     ],
+     [
+      -8.841335,
+      116.3667827
+     ]
+    ],
+    "skenario": [
+     {
+      "id": "ssp126",
+      "label": "SSP 1-2.6 (emisi sangat rendah)"
+     },
+     {
+      "id": "ssp245",
+      "label": "SSP 2-4.5 (emisi rendah)"
+     },
+     {
+      "id": "ssp370",
+      "label": "SSP 3-7.0 (emisi sedang)"
+     },
+     {
+      "id": "ssp585",
+      "label": "SSP 5-8.5 (emisi tinggi)"
+     }
+    ],
+    "periode": [
+     "2030",
+     "2035",
+     "2040",
+     "2045",
+     "2050",
+     "2055",
+     "2060"
+    ],
+    "return_period": [
+     5,
+     10,
+     25,
+     50
+    ],
+    "berkas": "data/bahaya/banjir/mandalika/{skenario}_{periode}_T{T}.png",
+    "catatan": "Kedalaman genangan ENSEMBLE median lima GCM, pemodelan Mandalika v5."
+   },
+   "erosi": {
+    "bounds": [
+     [
+      -8.9308489,
+      116.2690098
+     ],
+     [
+      -8.892426,
+      116.3552571
+     ]
+    ],
+    "skenario": [
+     {
+      "id": "ssp126",
+      "label": "SSP 1-2.6 (emisi sangat rendah)"
+     },
+     {
+      "id": "ssp245",
+      "label": "SSP 2-4.5 (emisi rendah)"
+     },
+     {
+      "id": "ssp370",
+      "label": "SSP 3-7.0 (emisi sedang)"
+     },
+     {
+      "id": "ssp585",
+      "label": "SSP 5-8.5 (emisi tinggi)"
+     }
+    ],
+    "tahun": [
+     2030,
+     2035,
+     2040,
+     2045,
+     2050,
+     2055,
+     2060
+    ],
+    "berkas": "data/bahaya/erosi/mandalika/{skenario}_{tahun}.png",
+    "catatan": "Mundurnya garis pantai pada sel yang terklasifikasi erosi, proyeksi laju alami ditambah kenaikan muka laut (aturan Bruun)."
+   }
+  },
+  "golo_mori": {}
+ }
+}

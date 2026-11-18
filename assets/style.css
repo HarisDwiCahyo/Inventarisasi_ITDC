@@ -646,7 +646,7 @@ input::placeholder, textarea::placeholder { color: var(--ink-35); }
 }
 
 .kotak-lapis {
-  width: 204px;
+  width: 232px;
   padding: var(--s3) var(--s4) var(--s4);
   border: var(--bw) solid var(--line);
   border-radius: var(--r);
@@ -666,6 +666,11 @@ input::placeholder, textarea::placeholder { color: var(--ink-35); }
 }
 
 .lapis-baris input { width: 13px; height: 13px; accent-color: var(--primary); cursor: pointer; flex: none; }
+
+/* display:flex mengalahkan atribut hidden bawaan browser, jadi barisnya
+   harus disembunyikan secara tegas. Berlaku untuk baris zona dan baris
+   dimensi lapisan bahaya. */
+.lapis-baris[hidden], .lapis-pilih[hidden] { display: none; }
 
 .opasitas { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s2); }
 .opasitas input[type="range"] { flex: 1; height: 2px; accent-color: var(--primary); }
@@ -693,15 +698,27 @@ input::placeholder, textarea::placeholder { color: var(--ink-35); }
   transform: translateX(-50%);
   z-index: 650;
   display: none;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--s3);
-  max-width: calc(100% - var(--s6));
+  justify-content: center;
+  gap: var(--s2) var(--s3);
+  width: max-content;
+  max-width: min(600px, calc(100% - var(--s5)));
   padding: var(--s2) var(--s3);
   border: var(--bw) solid var(--ink);
   border-radius: var(--r);
   background: var(--ink);
   color: #fff;
 }
+
+/* teks boleh menyusut dan turun baris, tombol tidak pernah terpotong */
+.gambar-bar .teks {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.gambar-bar .btn { flex: 0 0 auto; }
 
 :root[data-theme="dark"] .gambar-bar { background: var(--paper-high); border-color: var(--line-kuat); }
 
@@ -1050,7 +1067,23 @@ legend {
 
   .peta-alat-kanan { top: var(--s3); right: var(--s3); }
   .kotak-lapis { width: 186px; }
-  .gambar-bar { bottom: var(--s3); flex-wrap: wrap; justify-content: center; width: calc(100% - var(--s4)); }
+  /* di layar sempit bar melebar penuh, teks mengambil barisnya sendiri,
+     dan tombol dibagi rata supaya cukup besar untuk disentuh */
+  .gambar-bar {
+    left: var(--s2);
+    right: var(--s2);
+    bottom: calc(var(--s2) + env(safe-area-inset-bottom, 0px));
+    transform: none;
+    width: auto;
+    max-width: none;
+  }
+
+  .gambar-bar .teks { flex: 1 1 100%; text-align: center; }
+  .gambar-bar .btn { flex: 1 1 0; min-width: 84px; padding: 0 var(--s2); }
+
+  /* tombol zoom bawaan ditiadakan di layar sentuh supaya tidak bertabrakan
+     dengan bar gambar; perbesar dan perkecil cukup lewat cubitan jari */
+  .leaflet-control-zoom { display: none; }
   .rubrik.dua { grid-template-columns: 1fr; }
   .centang-grid { grid-template-columns: 1fr; }
   #toast-wadah { bottom: 84px; }
@@ -1064,3 +1097,18 @@ legend {
   .topbar, #panel, #drawer, .peta-alat-kanan, .gambar-bar { display: none !important; }
   #app { grid-template-columns: 1fr; grid-template-areas: "peta"; }
 }
+
+/* ---- lapisan bahaya: pemilih, legenda ---- */
+.lapis-catatan { margin: 0; font-size: var(--t-kecil); color: var(--ink-50); line-height: 1.45; }
+
+.lapis-select { width: 100%; font-size: var(--t-kecil); padding: 4px 6px; }
+
+.lapis-pilih { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s2); font-size: var(--t-kecil); }
+.lapis-pilih > span { flex: none; width: 76px; color: var(--ink-50); }
+.lapis-pilih select { flex: 1; min-width: 0; font-size: var(--t-kecil); padding: 4px 6px; }
+
+.legenda-bahaya { margin-top: var(--s3); padding-top: var(--s3); border-top: var(--bw) solid var(--line); }
+.legenda-bahaya .legenda-judul { font-size: var(--t-caps); color: var(--ink-50); margin-bottom: var(--s2); }
+.legenda-bahaya .legenda-baris { display: flex; align-items: center; gap: var(--s2); padding: 1px 0; font-size: var(--t-kecil); }
+.legenda-bahaya .legenda-kotak { width: 15px; height: 10px; border-radius: 2px; flex: none; border: var(--bw) solid var(--line-kuat); }
+.legenda-bahaya .legenda-sumber { margin: var(--s2) 0 0; font-size: var(--t-caps); color: var(--ink-50); line-height: 1.4; }
